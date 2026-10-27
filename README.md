@@ -158,3 +158,6 @@ A combined-loss baseline to isolate the effect of the architecture, 3D or inter-
 ## Citation and references
 
 If you use this code, please cite the thesis above. Main references: Ronneberger et al. (2015), U-Net; Schlemper et al. (2019), Attention Gated Networks; Hu et al. (2018), Squeeze-and-Excitation Networks; Wang et al. (2004), SSIM; IXI dataset, Brain Development Organization.
+## License
+
+Code released under the MIT License (see `LICENSE`). The IXI dataset is not included and has its own terms, see its website.
