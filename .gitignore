@@ -24,3 +24,5 @@ docs/PROJECT_STUDY_GUIDE.md
 results/*/*
 !results/*/metrics_summary.txt
 results/unet_t1_5_sanity_val/
+
+CODE_EXPLANATION_GUIDE.md
