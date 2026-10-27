@@ -1,0 +1,6 @@
+Model: unet
+Noise: rician at 5%
+PSNR: 36.69 ± 0.41 dB
+SSIM: 0.9495 ± 0.0064
+MAE: 0.008524
+Images: 200

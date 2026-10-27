@@ -1,0 +1,6 @@
+Model: improved_unet
+Noise: rician at 5%
+PSNR: 33.70 ± 0.35 dB
+SSIM: 0.9506 ± 0.0049
+MAE: 0.013526
+Images: 200
