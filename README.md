@@ -27,7 +27,7 @@ with noise levels of 5%, 9%, and 13%, and the output clipped to [0, 1].
 | Training loss | MSE | 0.5 * MSE + 0.5 * (1 - SSIM) |
 | Output | residual (input minus prediction) | residual (input minus prediction) |
 
-The standard U-Net has about 31.0 million trainable parameters. Both models use batch normalization and Kaiming normal initialization.
+The standard U-Net has about 31.0 million trainable parameters and the Improved U-Net about 45.5 million. Both models use batch normalization and Kaiming normal initialization.
 
 **MultiScaleBlock:** four parallel branches (1x1 convolution, 3x3 convolution, 5x5 convolution, and global average pooling with a 1x1 convolution), each producing a quarter of the channels. The outputs are concatenated, fused with a 1x1 convolution, recalibrated by squeeze-and-excitation (reduction ratio 16, minimum 4 channels), and added back to the block input through a residual connection.
 
@@ -102,12 +102,47 @@ pip install -r requirements.txt
 
 ## Usage
 
-The IXI dataset is not included. Download the T1 and T2 volumes from <https://brain-development.org/ixi-dataset/> and point the scripts at them.
+The IXI dataset is not included. Download the T1 and T2 volumes from <https://brain-development.org/ixi-dataset/> and split them by volume into `train`, `val`, and `test` folders, for example `data/IXI_T1/{train,val,test}`. The noise level is a fraction (0.05, 0.09, 0.13).
+
+**Train the Improved U-Net** (T1, 9% Rician noise, combined MSE + SSIM loss):
 
 ```bash
-python src/train.py --help
-python src/test.py --help
+python src/train.py \
+    --model improved_unet \
+    --loss combined --ssim_alpha 0.5 \
+    --noise_type rician --noise_level 0.09 \
+    --train_dir data/IXI_T1/train --val_dir data/IXI_T1/val \
+    --epochs 50 --batch_size 16 --lr 1e-4 --weight_decay 1e-5 \
+    --scheduler cosine --target_size 256 --amp \
+    --save_dir models/improved_t1_9
 ```
+
+**Train the baseline U-Net** (same setup, MSE loss only):
+
+```bash
+python src/train.py \
+    --model unet \
+    --loss mse \
+    --noise_type rician --noise_level 0.09 \
+    --train_dir data/IXI_T1/train --val_dir data/IXI_T1/val \
+    --epochs 50 --batch_size 16 --lr 1e-4 --weight_decay 1e-5 \
+    --scheduler cosine --target_size 256 --amp \
+    --save_dir models/unet_t1_9
+```
+
+**Evaluate** (200 test images, fixed seed, saves visual comparisons):
+
+```bash
+python src/test.py \
+    --model improved_unet \
+    --weights models/improved_t1_9/best_model.pth \
+    --input data/IXI_T1/test --output results/improved_t1_9_test \
+    --noise_type rician --noise_level 0.09 \
+    --max_images 200 --seed 42 \
+    --evaluate --visualize
+```
+
+For T2, point `--train_dir`, `--val_dir`, and `--input` at the T2 folders. For the other noise levels, change `--noise_level` and the output folder names. Run `python src/train.py --help` and `python src/test.py --help` to see all options.
 
 ## Limitations
 
